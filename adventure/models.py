@@ -5,6 +5,7 @@ from datetime import date
 from django.core.exceptions import ValidationError
 from django.db import models
 
+
 # Create your models here.
 
 
@@ -21,7 +22,7 @@ class Vehicle(models.Model):
     passengers = models.PositiveIntegerField()
     vehicle_type = models.ForeignKey(VehicleType, null=True, on_delete=models.SET_NULL)
     number_plate = models.CharField(max_length=10)
-    fuel_efficiency = models.DecimalField(max_digits=6, decimal_places=2) # in km/L
+    fuel_efficiency = models.DecimalField(max_digits=6, decimal_places=2)  # in km/L
     fuel_tank_size = models.DecimalField(max_digits=6, decimal_places=2)
 
     def __str__(self) -> str:
@@ -29,16 +30,17 @@ class Vehicle(models.Model):
 
     def can_start(self) -> bool:
         return self.vehicle_type.max_capacity >= self.passengers
-    
+
     def get_distribution(self) -> list:
         # Limitation: Fixed to 2 seats for row, this is not scalable but it's fast
-        partial_row, fullrows = math.modf(self.passengers/2) # separate full rows from partials
+        partial_row, fullrows = math.modf(self.passengers / 2)  # separate full rows from partials
         seat_distribution = [[True, True] for i in range(int(fullrows))]
 
         if partial_row > 0:
-            seat_distribution.append([True,False])
+            seat_distribution.append([True, False])
 
         return seat_distribution
+
 
 class Journey(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.PROTECT)
@@ -47,15 +49,22 @@ class Journey(models.Model):
 
     def __str__(self) -> str:
         return f"{self.vehicle.name} ({self.start} - {self.end})"
-    
+
     def is_finished(self):
         return (self.end != None and self.end <= date.today())
+
+
+def validate_number_plate(number_plate: str) -> bool:
+    list_number_plate = number_plate.split("-")
+    if list_number_plate[0].isalpha()and list_number_plate[1].isnumeric() and list_number_plate[2].isnumeric():
+        return True
+    return False
 
 class ServiceArea(models.Model):
     kilometer = models.IntegerField()
     gas_price = models.PositiveIntegerField()
-    left_station = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
-    right_station = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL)
+    left_station = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL,related_name='left')
+    right_station = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL,related_name='right')
 
     def validate_left(self):
         if self.left_station == None:
