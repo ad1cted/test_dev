@@ -12,3 +12,9 @@ class VehicleSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Vehicle
         fields = '__all__'
+
+
+class ServiceAreaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ServiceArea
+        fields = '__all__'

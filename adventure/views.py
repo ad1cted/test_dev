@@ -7,8 +7,8 @@ from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 
 from adventure import models, notifiers, repositories, serializers, usecases
-from adventure.models import Vehicle, validate_number_plate, Journey
-from adventure.serializers import VehicleSerializer
+from adventure.models import Vehicle, validate_number_plate, Journey, ServiceArea
+from adventure.serializers import VehicleSerializer, ServiceAreaSerializer
 
 
 class CreateVehicleAPIView(APIView):
@@ -31,6 +31,18 @@ class CreateVehicleAPIView(APIView):
         )
 
 
+class GetServiceAreaAPIView(APIView):
+    def get(self, request: Request, kilometers: float) -> Response:
+        if kilometers:
+            service_area: QuerySet[ServiceArea] = ServiceArea.objects.get(kilometers=kilometers)
+        else:
+            service_area: QuerySet[ServiceArea] = ServiceArea.objects.all()
+        serializer: ServiceAreaSerializer = ServiceAreaSerializer(service_area, many=True)
+        return Response(serializer.data,
+                        status=200,
+                        )
+
+
 class GetVehicleAPIView(APIView):
     def get(self, request: Request, license: str) -> Response:
         if license is None:
@@ -45,7 +57,6 @@ class GetVehicleAPIView(APIView):
         return Response(serializer.data,
                         status=200,
                         )
-
 
 
 class CreateServiceAreaAPIView(APIView):

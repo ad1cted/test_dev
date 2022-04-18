@@ -88,7 +88,7 @@ class TestGetVehicleAPIView:
             models.Vehicle.objects,
             "create",
             return_value=models.Vehicle(
-                id=1, name="Kitt", passengers=4, vehicle_type=vehicle_type, number_plate = number_plate_test
+                id=1, name="Kitt", passengers=4, vehicle_type=vehicle_type, number_plate=number_plate_test
             ),
         )
         assert client.get(f"/api/adventure/get-vehicle/{number_plate_test}").status_code == 200
@@ -97,12 +97,38 @@ class TestGetVehicleAPIView:
 @pytest.mark.skip  # Remove
 class TestGetServiceAreaAPIView:
     def test_get(self, client, mocker):
-        # TODO: Implement endpoint to get full list of service areas
-        pass
+        mocker.patch.object(
+            models.ServiceArea.objects,
+            "create",
+            return_value=models.ServiceArea(
+                id=1, kilometer=60, gas_price=784
+            ),
+        )
+        mocker.patch.object(
+            models.ServiceArea.objects,
+            "create",
+            return_value=models.ServiceArea(
+                id=2, kilometer=600, gas_price=333
+            ),
+        )
+        assert client.get(f"/api/adventure/get-vehicle/").status_code == 200
 
     def test_get_by_kilometer(self, client, mocker):
-        # TODO: Implement endpoint to get service area by kilometer
-        pass
+        mocker.patch.object(
+            models.ServiceArea.objects,
+            "create",
+            return_value=models.ServiceArea(
+                id=1, kilometer=600, gas_price=784
+            ),
+        )
+        mocker.patch.object(
+            models.ServiceArea.objects,
+            "create",
+            return_value=models.ServiceArea(
+                id=2, kilometer=600, gas_price=333
+            ),
+        )
+        assert client.get(f"/api/adventure/get-vehicle/kilometer=600").status_code == 200 and len(client.get(f"/api/adventure/get-vehicle/kilometer=600").json()) == 2
 
 
 class TestStartJourneyAPIView:

@@ -8,5 +8,7 @@ urlpatterns = [
     path("start/", views.StartJourneyAPIView.as_view()),
     path("get-vehicle/", views.GetVehicleAPIView.as_view()),
     path("get-vehicle/<str:license>", views.GetVehicleAPIView.as_view()),
+    path("get-service-area/", views.GetServiceAreaAPIView.as_view()),
+    path("get-service-area/<str:kilometers>", views.GetServiceAreaAPIView.as_view()),
 
 ]
