@@ -1,3 +1,4 @@
+from django.db.models import QuerySet
 from rest_framework import generics
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -5,6 +6,8 @@ from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 
 from adventure import models, notifiers, repositories, serializers, usecases
+from adventure.models import Vehicle
+from adventure.serializers import VehicleSerializer
 
 
 class CreateVehicleAPIView(APIView):
@@ -25,6 +28,16 @@ class CreateVehicleAPIView(APIView):
             },
             status=201,
         )
+
+
+class GetVehicleAPIView(APIView):
+    def get(self, request: Request) -> Response:
+        vehicles: QuerySet[Vehicle] = models.Vehicle.objects.all()
+        serializer: VehicleSerializer = VehicleSerializer(vehicles, many=True)
+        return Response(serializer.data,
+                        status=200,
+                        )
+
 
 class CreateServiceAreaAPIView(APIView):
     def post(self, request: Request) -> Response:
@@ -48,6 +61,7 @@ class CreateServiceAreaAPIView(APIView):
             },
             status=201
         )
+
 
 class StartJourneyAPIView(generics.CreateAPIView):
     serializer_class = serializers.JourneySerializer
