@@ -1,4 +1,5 @@
 from django.db.models import QuerySet
+from django.utils import timezone
 from rest_framework import generics
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -6,7 +7,7 @@ from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 
 from adventure import models, notifiers, repositories, serializers, usecases
-from adventure.models import Vehicle, validate_number_plate
+from adventure.models import Vehicle, validate_number_plate, Journey
 from adventure.serializers import VehicleSerializer
 
 
@@ -44,6 +45,7 @@ class GetVehicleAPIView(APIView):
         return Response(serializer.data,
                         status=200,
                         )
+
 
 
 class CreateServiceAreaAPIView(APIView):

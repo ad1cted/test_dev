@@ -9,6 +9,4 @@ urlpatterns = [
     path("get-vehicle/", views.GetVehicleAPIView.as_view()),
     path("get-vehicle/<str:license>", views.GetVehicleAPIView.as_view()),
 
-
-
 ]

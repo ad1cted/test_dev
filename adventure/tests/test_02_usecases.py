@@ -3,6 +3,7 @@ from django.utils import timezone
 
 from adventure import models, notifiers, repositories, usecases
 
+
 #########
 # Mocks #
 #########
@@ -13,7 +14,7 @@ class MockJourneyRepository(repositories.JourneyRepository):
         return models.VehicleType(name="car", max_capacity=4)
 
     def create_vehicle(
-        self, name: str, passengers: int, vehicle_type: models.VehicleType
+            self, name: str, passengers: int, vehicle_type: models.VehicleType
     ) -> models.Vehicle:
         return models.Vehicle(
             name=name, passengers=passengers, vehicle_type=vehicle_type
@@ -21,6 +22,9 @@ class MockJourneyRepository(repositories.JourneyRepository):
 
     def create_journey(self, vehicle) -> models.Journey:
         return models.Journey(vehicle=vehicle, start=timezone.now().date())
+
+    def stop_journey(self, journey: models.Journey) -> models.Journey:
+        return models.Journey(vehicle=journey.vehicle, end=timezone.now().date())
 
 
 class MockNotifier(notifiers.Notifier):
@@ -53,9 +57,12 @@ class TestStartJourney:
 
 
 class TestStopJourney:
-    @pytest.mark.skip  # Remove
-    def test_stop(self):
-        # TODO: Implement a StopJourney Usecase
-        # it takes a started journey as a parameter and sets an "end" value
-        # then saves it to the database
-        pass
+    def test_stop_journey(self):
+        repo = MockJourneyRepository()
+        notifier = MockNotifier()
+        data = {"name": "Kitt", "passengers": 2}
+        usecase = usecases.StartJourney(repo, notifier).set_params(data)
+        journey = usecase.execute()
+        stopped_journey = repo.stop_journey(journey)
+        #assert stopped_journey.end < timezone.now().date()  #nope
+        assert stopped_journey.is_finished
