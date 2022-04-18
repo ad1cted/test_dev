@@ -6,7 +6,7 @@ from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 
 from adventure import models, notifiers, repositories, serializers, usecases
-from adventure.models import Vehicle
+from adventure.models import Vehicle, validate_number_plate
 from adventure.serializers import VehicleSerializer
 
 
@@ -31,8 +31,15 @@ class CreateVehicleAPIView(APIView):
 
 
 class GetVehicleAPIView(APIView):
-    def get(self, request: Request) -> Response:
-        vehicles: QuerySet[Vehicle] = models.Vehicle.objects.all()
+    def get(self, request: Request, license: str) -> Response:
+        if license is None:
+            vehicles: QuerySet[Vehicle] = models.Vehicle.objects.all()
+        else:
+            if validate_number_plate(license):
+                vehicles: Vehicle = models.Vehicle.objects.filter(number_plate=license)
+            else:
+                return Response("Invalid license plate", status=400)
+
         serializer: VehicleSerializer = VehicleSerializer(vehicles, many=True)
         return Response(serializer.data,
                         status=200,

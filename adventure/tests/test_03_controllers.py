@@ -63,6 +63,7 @@ class TestCreateServiceAreaAPIView:
 
 @pytest.mark.django_db
 class TestGetVehicleAPIView:
+
     def test_get(self, client, mocker):
         vehicle_type = models.VehicleType(name="car")
         mocker.patch.object(
@@ -78,8 +79,19 @@ class TestGetVehicleAPIView:
         assert client.get("/api/adventure/get-vehicle/").status_code == 200
 
     def test_get_by_license_plate(self, client, mocker):
-        # TODO: Implement endpoint to get vehicle data by license plate
-        pass
+        number_plate_test = "AA-12-34"
+        vehicle_type = models.VehicleType(name="car")
+        mocker.patch.object(
+            models.VehicleType.objects, "get", return_value=vehicle_type
+        )
+        mocker.patch.object(
+            models.Vehicle.objects,
+            "create",
+            return_value=models.Vehicle(
+                id=1, name="Kitt", passengers=4, vehicle_type=vehicle_type, number_plate = number_plate_test
+            ),
+        )
+        assert client.get(f"/api/adventure/get-vehicle/{number_plate_test}").status_code == 200
 
 
 @pytest.mark.skip  # Remove
